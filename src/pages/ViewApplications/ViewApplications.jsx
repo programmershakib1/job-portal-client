@@ -1,12 +1,34 @@
 import React from "react";
 import { useLoaderData, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ViewApplications = () => {
   const p = useParams();
   console.log(p);
   const applications = useLoaderData();
   const handleStatusUpdate = (e, id) => {
-    e.target;
+    const data = {
+      status: e.target.value,
+    };
+    fetch(`http://localhost:5000/job-applications/${id}`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.modifiedCount) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Status has been updated",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      });
   };
   return (
     <div>
@@ -18,8 +40,8 @@ const ViewApplications = () => {
             <tr>
               <th></th>
               <th>Email</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
+              <th>Status</th>
+              <th>Update Status</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +58,7 @@ const ViewApplications = () => {
                   >
                     <option disabled>Change Status</option>
                     <option>Under Review</option>
+                    <option>Set Interview</option>
                     <option>Hired</option>
                     <option>Rejected</option>
                   </select>
